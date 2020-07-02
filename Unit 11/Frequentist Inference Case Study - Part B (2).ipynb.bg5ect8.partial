@@ -1,0 +1,532 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Frequentist Inference Case Study - Part B"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Learning objectives"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Welcome to Part B of the Frequentist inference case study! The purpose of this case study is to help you apply the concepts associated with Frequentist inference in Python. In particular, you'll practice writing Python code to apply the following statistical concepts: \n",
+    "* the _z_-statistic\n",
+    "* the _t_-statistic\n",
+    "* the difference and relationship between the two\n",
+    "* the Central Limit Theorem, including its assumptions and consequences\n",
+    "* how to estimate the population mean and standard deviation from a sample\n",
+    "* the concept of a sampling distribution of a test statistic, particularly for the mean\n",
+    "* how to combine these concepts to calculate a confidence interval"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "In the previous notebook, we used only data from a known normal distribution. **You'll now tackle real data, rather than simulated data, and answer some relevant real-world business problems using the data.**"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Hospital medical charges"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Imagine that a hospital has hired you as their data scientist. An administrator is working on the hospital's business operations plan and needs you to help them answer some business questions. \n",
+    "\n",
+    "In this assignment notebook, you're going to use frequentist statistical inference on a data sample to answer the questions:\n",
+    "* has the hospital's revenue stream fallen below a key threshold?\n",
+    "* are patients with insurance really charged different amounts than those without?\n",
+    "\n",
+    "Answering that last question with a frequentist approach makes some assumptions, and requires some knowledge, about the two groups."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We are going to use some data on medical charges obtained from [Kaggle](https://www.kaggle.com/easonlai/sample-insurance-claim-prediction-dataset). \n",
+    "\n",
+    "For the purposes of this exercise, assume the observations are the result of random sampling from our single hospital. Recall that in the previous assignment, we introduced the Central Limit Theorem (CLT), and its consequence that the distributions of sample statistics approach a normal distribution as $n$ increases. The amazing thing about this is that it applies to the sampling distributions of statistics that have been calculated from even highly non-normal distributions of data! Recall, also, that hypothesis testing is very much based on making inferences about such sample statistics. You're going to rely heavily on the CLT to apply frequentist (parametric) tests to answer the questions in this notebook."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import pandas as pd\n",
+    "import numpy as np\n",
+    "import matplotlib.pyplot as plt\n",
+    "from scipy.stats import t\n",
+    "from numpy.random import seed\n",
+    "medical = pd.read_csv('insurance2.csv')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(1338, 8)"
+      ]
+     },
+     "execution_count": 6,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "medical.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>age</th>\n",
+       "      <th>sex</th>\n",
+       "      <th>bmi</th>\n",
+       "      <th>children</th>\n",
+       "      <th>smoker</th>\n",
+       "      <th>region</th>\n",
+       "      <th>charges</th>\n",
+       "      <th>insuranceclaim</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>19</td>\n",
+       "      <td>0</td>\n",
+       "      <td>27.900</td>\n",
+       "      <td>0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>3</td>\n",
+       "      <td>16884.92400</td>\n",
+       "      <td>1</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>18</td>\n",
+       "      <td>1</td>\n",
+       "      <td>33.770</td>\n",
+       "      <td>1</td>\n",
+       "      <td>0</td>\n",
+       "      <td>2</td>\n",
+       "      <td>1725.55230</td>\n",
+       "      <td>1</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>28</td>\n",
+       "      <td>1</td>\n",
+       "      <td>33.000</td>\n",
+       "      <td>3</td>\n",
+       "      <td>0</td>\n",
+       "      <td>2</td>\n",
+       "      <td>4449.46200</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>33</td>\n",
+       "      <td>1</td>\n",
+       "      <td>22.705</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>21984.47061</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>32</td>\n",
+       "      <td>1</td>\n",
+       "      <td>28.880</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>3866.85520</td>\n",
+       "      <td>1</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   age  sex     bmi  children  smoker  region      charges  insuranceclaim\n",
+       "0   19    0  27.900         0       1       3  16884.92400               1\n",
+       "1   18    1  33.770         1       0       2   1725.55230               1\n",
+       "2   28    1  33.000         3       0       2   4449.46200               0\n",
+       "3   33    1  22.705         0       0       1  21984.47061               0\n",
+       "4   32    1  28.880         0       0       1   3866.85520               1"
+      ]
+     },
+     "execution_count": 7,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "medical.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "__Q1:__ Plot the histogram of charges and calculate the mean and standard deviation. Comment on the appropriateness of these statistics for the data."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "__A:__"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 12,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "13270.422265141257\n",
+      "12110.011236693994\n"
+     ]
+    }
+   ],
+   "source": [
+    "charges_mean = np.mean(medical.charges)\n",
+    "print(charges_mean)\n",
+    "\n",
+    "charges_std = np.std(medical.charges,ddof=1)\n",
+    "print(charges_std)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 13,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "image/png": "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\n",
+      "text/plain": [
+       "<Figure size 432x288 with 1 Axes>"
+      ]
+     },
+     "metadata": {
+      "needs_background": "light"
+     },
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "_ = plt.hist(medical.charges, bins=30)\n",
+    "_ = plt.xlabel('charges')\n",
+    "_ = plt.ylabel('frequency')\n",
+    "_ = plt.axvline(round(charges_mean,2), color='k')\n",
+    "_ = plt.axvline(round(charges_mean + charges_std, 2), color='r', linestyle='--')\n",
+    "_ = plt.axvline(round(charges_mean - charges_std, 2), color='r', linestyle='--')\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Q2:The administrator is concerned that the actual average charge has fallen below 12,000, threatening the hospital's operational model. On the assumption that these data represent a random sample of charges, how would you justify that these data allow you to answer that question? And what would be the most appropriate frequentist test, of the ones discussed so far, to apply?"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "A: Given that these data have been randomly selected, they can be used to model the true population and return confidence intervals for the results.Based on central limit theorem, it is possible to contruct the confidence interval with the data using t-distribution."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "__Q3:__ Given the nature of the administrator's concern, what is the appropriate confidence interval in this case? A ***one-sided*** or ***two-sided*** interval? (Refresh your understanding of this concept on p. 399 of the *AoS*). Calculate the critical value and the relevant 95% confidence interval for the mean, and comment on whether the administrator should be concerned."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "A: Since the administrator's concern is only about charges falling below 12,000, a one-sided interval should be chosen. The Central Limit Thereom tells us that sample means for a sufficiently large random sample will have a normal distribution around the actual population mean.."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 15,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "12725.48718381623"
+      ]
+     },
+     "execution_count": 15,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "n = len(medical.charges)\n",
+    "df = n - 1\n",
+    "critical_value = t(df).ppf(0.95)\n",
+    "medical.charges.mean() - (critical_value* medical.charges.std() / np.sqrt(n))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The administrator then wants to know whether people with insurance really are charged a different amount to those without.\n",
+    "\n",
+    "__Q4:__ State the null and alternative hypothesis here. Use the _t_-test for the difference between means, where the pooled standard deviation of the two groups is given by:\n",
+    "\\begin{equation}\n",
+    "s_p = \\sqrt{\\frac{(n_0 - 1)s^2_0 + (n_1 - 1)s^2_1}{n_0 + n_1 - 2}}\n",
+    "\\end{equation}\n",
+    "\n",
+    "and the *t*-test statistic is then given by:\n",
+    "\n",
+    "\\begin{equation}\n",
+    "t = \\frac{\\bar{x}_0 - \\bar{x}_1}{s_p \\sqrt{1/n_0 + 1/n_1}}.\n",
+    "\\end{equation}\n",
+    "\n",
+    "(If you need some reminding of the general definition of ***t-statistic***, check out the definition on p. 404 of *AoS*). \n",
+    "\n",
+    "What assumption about the variances of the two groups are we making here?"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "A:The assumptions are that both groups are selected at random and that their variances are equal."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "__Q5:__ Perform this hypothesis test both manually, using the above formulae, and then using the appropriate function from [scipy.stats](https://docs.scipy.org/doc/scipy/reference/stats.html#statistical-tests) (hint, you're looking for a function to perform a _t_-test on two independent samples). For the manual approach, calculate the value of the test statistic and then its probability (the p-value). Verify you get the same results from both."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "__A:__ "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 22,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "charge_insured = medical.charges.loc[medical.insuranceclaim == 1]\n",
+    "\n",
+    "n0 = len(charge_insured)\n",
+    "s0 = charge_insured.std()\n",
+    "x0= charge_insured.mean()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 23,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "charge_uninsured = medical.charges.loc[medical.insuranceclaim == 0]\n",
+    "\n",
+    "n1 = len(charge_uninsured)\n",
+    "s1 = charge_uninsured.std()\n",
+    "x1 = charge_uninsured.mean()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 29,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "11.89329903087671"
+      ]
+     },
+     "execution_count": 29,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "sp = np.sqrt(((n0 - 1) * s0 ** 2 + (n1 - 1) * s1 ** 2) / (n0 + n1 - 2))\n",
+    "t_score = (x0 - x1) / sp /np.sqrt(1 / n0 + 1 / n1)\n",
+    "t_score"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 30,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "0.0"
+      ]
+     },
+     "execution_count": 30,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "p_value = (1 - t(n0 + n1 - 1).cdf(t_score)) * 2\n",
+    "p_value"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 32,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from scipy.stats import ttest_ind"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 33,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "Ttest_indResult(statistic=11.893299030876712, pvalue=4.461230231620717e-31)"
+      ]
+     },
+     "execution_count": 33,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "ttest_ind(charge_insured, charge_uninsured)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Congratulations! Hopefully you got the exact same numerical results. This shows that you correctly calculated the numbers by hand. Secondly, you used the correct function and saw that it's much easier to use. All you need to do is pass your data to it."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "__Q6:__ Conceptual question: look through the documentation for statistical test functions in scipy.stats. You'll see the above _t_-test for a sample, but can you see an equivalent one for performing a *z*-test from a sample? Comment on your answer."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "A:There is no function to perform a z-test from a sample, because when sample size is small, z-test is not a viable choice. However, when sample size is large enough for a viable z-test, t-test will give identical results."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Learning outcomes"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Having completed this project notebook, you now have good hands-on experience:\n",
+    "* using the central limit theorem to help you apply frequentist techniques to answer questions that pertain to very non-normally distributed data from the real world\n",
+    "* performing inference using such data to answer business questions\n",
+    "* forming a hypothesis and framing the null and alternative hypotheses\n",
+    "* testing this using a _t_-test"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.7.3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
