@@ -13,11 +13,17 @@ The intended application of the project is for use in applying visibility weight
 Dependencies
 
 • python 3.x
+
 • nltk
+
 • numpy
+
 • sklearn
+
 • scipy
+
 • pandas
+
 • spacy
 
 Dataset
