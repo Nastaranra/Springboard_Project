@@ -34,18 +34,14 @@ Future Work:
 
 
 
-•	Our research focuses on daily news articles which have on average around
-
-         1000 words. It is difficult to detect linguistic cues in single (or few) statement
-
-          news. Some other method can be researched upon for these cases.
+• Our research focuses on daily news articles which have on average around
+ 1000 words. It is difficult to detect linguistic cues in single (or few) statement
+news. Some other method can be researched upon for these cases.
 
 
-•	For designing a fake news detector for social media like Facebook or twitter,
-
-          we can take into account the user information, user authenticity and origin of
-
-          the news.
+• For designing a fake news detector for social media like Facebook or twitter,
+we can take into account the user information, user authenticity and origin of
+the news.
 
 
 
