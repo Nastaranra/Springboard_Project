@@ -2,7 +2,7 @@
 
 A project on techniques with imbalanced classification
 
-Project Introduction
+## Project Introduction
 
 It is often that the data we retrieve have imbalanced label and we are asked to make classification. These scenarios are troublesome since not only the models we usally use bring poor result, but also the evaluation metric we often used, accuracy, is not adequate for imbalanced data sets due to the impact of the minority class. This project aims to demonstrate some techniques used to combat these situations, such as resampling or cluster before predicting, as well as using PR (Precision-Recall) curve to evaluate model. The approaches for the project are :
 
@@ -17,7 +17,7 @@ It is often that the data we retrieve have imbalanced label and we are asked to 
 8. Find the optimised threshold of the chosen model.
 9. Predict on test set to report final result.
 
-Data Description
+## Data Description
 
 
 The project take use of The Credit Card Fraud Data on Kaggle, the data description on the webpage is as followed :
@@ -29,7 +29,7 @@ Given the class imbalance ratio, we recommend measuring the accuracy using the A
 The dataset has been collected and analysed during a research collaboration of Worldline and the Machine Learning Group of ULB (Université Libre de Bruxelles) on big data mining and fraud detection. 
 
 
-Link to Jupyter Notebook in Repository
+## Link to Jupyter Notebook in Repository
 
 https://drive.google.com/file/d/1OWgSR99AwIBez99juSgQMZUog4yeIJVT/view?usp=sharing
 https://github.com/Nastaranra/Springboard_Project/blob/master/Unit%2020/Capstone_Two_Documentation.ipynb
