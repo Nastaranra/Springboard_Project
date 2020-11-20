@@ -36,6 +36,42 @@ We get the ground truth data from https://www.kaggle.com/arminehn/rumor-citation
 Building machine learning models to detect fake news
 Using multiple data sources to detect fake news.
 
+## Exploratory Data Analysis:
+
+
+•	The purpose of EDA is to enhance our understanding of trends in the dataset without involving complicated machine learning models. 
+
+•	The last stage of my exploratory data analysis of the text is Word cloud analysis. Word cloud is a great way to represent text data. The size and color of each word that appears in the Word cloud indicate its frequency or importance.
+
+•	In the results, we can see how often some words used in the news text in fake or real news.
+
+
+## Prediction Algorithms 
+
+We implemented five different algorithms from scratch for the prediction model which were: Logistic Regression model and the Naïve Bayes classifier model, PassiveAgressiveClassifier model, Support Vector Machine model, Random Forest. 
+
+
+## Evaluation Metrics 
+
+We used the following three metrics for the evaluation of our results. The use of more than one matrix helped us evaluate the performance of the models from different perspectives.
+
+
+
+## Conclusion
+
+We successfully implemented a machine learning and
+Natural Language Processing model to detect whether 
+An article was fake or real.
+We got 7592 articles correctly identified as Fake and 7131
+Correctly identified as real. When doing such a classification, 
+it is important to check that we limit the number of false positives 
+as they can cause real to be marked as fake.
+I would like to choose PassiveAggressiveClassifier method, because this 
+method has less false positive and false negative.
+So overall PassiveAggressiveClassifier Method performed much better in 
+determining in fake news cases which is around 99%.
+
+
 ## Future Work:
 
 
